@@ -1,9 +1,9 @@
 #Deployment
-###controllers/loyalty-deploy.tml
+###controllers/cb-deploy.tml
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: customerbroker-deployment
+  name: cb-deployment
 spec:
   replicas: 1
   strategy:
@@ -15,14 +15,14 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: customerbroker-app
+      app: cb-app
   template:
     metadata:
       labels:
         app: customerbroker-app
     spec:
       containers:
-      - name: customerbroker-container
+      - name: cb-container
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: Always
         resources:
@@ -36,7 +36,7 @@ spec:
         - containerPort: 8080
         envFrom:
         - configMapRef:
-            name: customerbroker-config
+            name: cb-config
       imagePullSecrets:
       - name: loyalsecret
 
