@@ -1,0 +1,35 @@
+node {
+  def app
+  def versionnum
+  stage('Clone repository') {
+    checkout scm
+	sh 'cp Docker/init6/VERSION.txt VERSION.txt'
+    sh 'cp Docker/init6/ams-init6.properties ams-init6.properties'
+    sh 'cp Docker/init6/Dockerfile Dockerfile'
+    sh 'cp Docker/init6/init6.postman_collection.json init6.postman_collection.json'
+    sh 'cp Docker/init6/ditinit6.postman_environment.json ditinit6.postman_environment.json'
+  }
+  stage('Build image') {
+    app = docker.build("ams/init6demo1")
+  versionnum= '$(cat VERSION.txt)'
+    app = docker.build("ams/init6demo1","--build-arg version_no=$versionnum .")
+  }
+  stage('Push image') {
+    docker.withRegistry('https://nexus.docker.com:7443/init6', '93dbcea8-073b-40cd-8ef8-6c603d2859c8') {
+      app.push("${env.BUILD_NUMBER}")
+    }
+  }
+  stage('Deploy') {
+    sh '/usr/local/bin/helm upgrade --install init6s-demo /var/lib/jenkins/init6s-demo --recreate-pods --set image.repository=nexus.docker.com:7443/image/init6demo1 --set image.tag=${BUILD_NUMBER}'
+  }
+  stage('Test') {
+    sh 'sleep 40'
+    sh 'sleep 60'
+    sh 'newman run init6.postman_collection.json -e ditinit6.postman_environment.json'
+  }
+  stage('Delete images') {
+    echo 'Deleting image..'
+    sh 'docker images'
+    sh 'docker image prune -a -f'
+  }
+}
