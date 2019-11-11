@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: sez00vvm-168.sweng.ncr.com:7443/ams/promotionbroker
+  repository: dockerhub
   tag: latest
   pullPolicy: IfNotPresent
 
