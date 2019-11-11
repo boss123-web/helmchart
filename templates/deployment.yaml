@@ -1,0 +1,53 @@
+#Deployment
+###controllers/loyalty-deploy.tml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: promotionbroker-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: promotion-app
+  template:
+    metadata:
+      labels:
+        app: promotion-app
+    spec:
+      containers:
+      - name: promotion-container
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: promotionbroker-config
+        volumeMounts:
+        - name: nfs-volume
+          mountPath: "/target/service-in"
+        - name: nfs-volume1
+          mountPath: "/opt/ncrue/data"
+        - name: efklog
+          mountPath: /var/log
+      - name: count-log-1
+        image: busybox
+        args: [/bin/sh, -c, 'tail -n+1 -F /var/log/ams-broker-promotion.log']
+        volumeMounts:
+        - name: efklog
+          mountPath: /var/log  
+      volumes:
+      - name: nfs-volume
+        nfs:
+          server: 153.78.37.157
+          path: /target/service-in
+      - name: nfs-volume1
+        nfs:
+          server: 153.78.37.157
+          path: /opt/ncrue/data
+      - name: efklog
+        emptyDir: {}
+      imagePullSecrets:
+      - name: loyalsecret
+
+
