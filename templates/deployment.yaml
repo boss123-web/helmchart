@@ -1,38 +1,38 @@
 #Deployment
-###controllers/loyalty-deploy.tml
+###controllers/pb-deploy.tml
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: promotionbroker-deployment
+  name: pb-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: promotion-app
+      app: pb-app
   template:
     metadata:
       labels:
-        app: promotion-app
+        app: pb-app
     spec:
       containers:
-      - name: promotion-container
+      - name: pb-container
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
         envFrom:
         - configMapRef:
-            name: promotionbroker-config
+            name: prb-config
         volumeMounts:
         - name: nfs-volume
-          mountPath: "/target/service-in"
+          mountPath: "/data"
         - name: nfs-volume1
-          mountPath: "/opt/ncrue/data"
+          mountPath: "/opt/history"
         - name: efklog
           mountPath: /var/log
       - name: count-log-1
         image: busybox
-        args: [/bin/sh, -c, 'tail -n+1 -F /var/log/ams-broker-promotion.log']
+        args: [/bin/sh, -c, 'tail -n+1 -F /var/log/pb.log']
         volumeMounts:
         - name: efklog
           mountPath: /var/log  
@@ -40,12 +40,12 @@ spec:
       - name: nfs-volume
         nfs:
           server: 153.78.37.157
-          path: /target/service-in
+          path: /data
       - name: nfs-volume1
         nfs:
           server: 153.78.37.157
-          path: /opt/ncrue/data
-      - name: efklog
+          path: /opt/
+          - name: efklog
         emptyDir: {}
       imagePullSecrets:
       - name: loyalsecret
