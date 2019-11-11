@@ -1,14 +1,14 @@
 # Service - LoadBalancer
-# # loyalty-service -lb.yml
+# # pb-service -lb.yml
 apiVersion: v1
 kind: Service
 metadata:
-  name: promotionbroker-demo
+  name: pb-demo
   labels:
-    app: promotion-app
+    app: pp-app
 spec:
   selector:
-    app: promotion-app
+    app: pb-app
   type: LoadBalancer
   ports:
   - nodePort: 32750
