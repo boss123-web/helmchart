@@ -1,0 +1,16 @@
+pipeline {
+	agent { label 'kpk' }
+    stages {
+        stage('Build on AKS ') {
+            steps {           
+                        sh 'pwd'
+                        sh 'ls -lart'
+                        sh 'cp -R Docker-AKS/springapp/helm/* .'
+                        sh 'pwd'
+                        sh 'id'
+                        sh '/usr/local/bin/helm upgrade --install spinrapp helmname  --set image.repository=dockerhub/path/imagename --set image.tag=2.0.0-SNAPSHOT.35'
+              			sh 'ls -lart'
+            }           
+        }
+    }
+}
