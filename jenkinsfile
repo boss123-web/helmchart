@@ -12,10 +12,10 @@ node {
   stage('Build image') {
     app = docker.build("ams/init6demo1")
   versionnum= '$(cat VERSION.txt)'
-    app = docker.build("ams/init6demo1","--build-arg version_no=$versionnum .")
+    app = docker.build("<path>/init6demo1","--build-arg version_no=$versionnum .")
   }
   stage('Push image') {
-    docker.withRegistry('https://nexus.docker.com:7443/init6', '93dbcea8-073b-40cd-8ef8-6c603d2859c8') {
+    docker.withRegistry('https://nexus.docker.com:<port>/init6', '93dbcea8-073b-40cd-8ef8-6c603d2859c8') {
       app.push("${env.BUILD_NUMBER}")
     }
   }
